@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { Meteor } from "meteor/meteor";
+import { createContainer } from "meteor/react-meteor-data";
 
-import { Tasks } from '../api/tasks.js';
-import AccountsUIWrapper from './AccountsUIWrapper';
+import { Tasks } from "../api/tasks.js";
+import AccountsUIWrapper from "./AccountsUIWrapper";
 
-import Task from './Task.jsx';
+import Task from "./Task.jsx";
 
 // App component - represents the whole app
 class App extends Component {
@@ -24,15 +24,10 @@ class App extends Component {
     // Find the text field via the React ref
     const text = this.refs.textInput.value.trim();
 
-    Tasks.insert({
-      text,
-      createdAt: new Date(), //current time
-      owner: Meteor.userId(), // _id of logged in user
-      username: Meteor.user().username //username of logged in user
-    });
+    Meteor.call("tasks.insert", text);
 
     // Clear form
-    this.refs.textInput.value = '';
+    this.refs.textInput.value = "";
   }
 
   toggleHideCompleted() {
@@ -70,10 +65,14 @@ class App extends Component {
 
           {this.props.currentUser ? (
             <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
-              <input type="text" ref="textInput" placeholder="Type to add new tasks" />
+              <input
+                type="text"
+                ref="textInput"
+                placeholder="Type to add new tasks"
+              />
             </form>
           ) : (
-            ''
+            ""
           )}
         </header>
 
