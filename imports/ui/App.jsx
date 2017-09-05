@@ -1,12 +1,13 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { Meteor } from "meteor/meteor";
-import { createContainer } from "meteor/react-meteor-data";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import ReactDOM from 'react-dom';
+import { Meteor } from 'meteor/meteor';
+import { createContainer } from 'meteor/react-meteor-data';
 
-import { Tasks } from "../api/tasks.js";
-import AccountsUIWrapper from "./AccountsUIWrapper";
+import { Tasks } from '../api/tasks.js';
 
-import Task from "./Task.jsx";
+import Task from './Task.jsx';
+import AccountsUIWrapper from './AccountsUIWrapper.jsx';
 
 // App component - represents the whole app
 class App extends Component {
@@ -22,12 +23,12 @@ class App extends Component {
     event.preventDefault();
 
     // Find the text field via the React ref
-    const text = this.refs.textInput.value.trim();
+    const text = ReactDOM.findDOMNode(this.refs.textInput).value.trim();
 
-    Meteor.call("tasks.insert", text);
+    Meteor.call('tasks.insert', text);
 
     // Clear form
-    this.refs.textInput.value = "";
+    ReactDOM.findDOMNode(this.refs.textInput).value = '';
   }
 
   toggleHideCompleted() {
@@ -38,23 +39,14 @@ class App extends Component {
 
   renderTasks() {
     let filteredTasks = this.props.tasks;
-
     if (this.state.hideCompleted) {
       filteredTasks = filteredTasks.filter(task => !task.checked);
     }
-
     return filteredTasks.map(task => {
-      const currentUserId =
-        this.props.currentUser && this.props.currentUser._id;
+      const currentUserId = this.props.currentUser && this.props.currentUser._id;
       const showPrivateButton = task.owner === currentUserId;
 
-      return (
-        <Task
-          key={task._id}
-          task={task}
-          showPrivateButton={showPrivateButton}
-        />
-      );
+      return <Task key={task._id} task={task} showPrivateButton={showPrivateButton} />;
     });
   }
 
@@ -62,7 +54,7 @@ class App extends Component {
     return (
       <div className="container">
         <header>
-          <h1>TodoList ({this.props.incompleteCount})</h1>
+          <h1>Todo List ({this.props.incompleteCount})</h1>
 
           <label className="hide-completed">
             <input
@@ -78,14 +70,10 @@ class App extends Component {
 
           {this.props.currentUser ? (
             <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
-              <input
-                type="text"
-                ref="textInput"
-                placeholder="Type to add new tasks"
-              />
+              <input type="text" ref="textInput" placeholder="Type to add new tasks" />
             </form>
           ) : (
-            ""
+            ''
           )}
         </header>
 
@@ -98,12 +86,12 @@ class App extends Component {
 App.propTypes = {
   tasks: PropTypes.array.isRequired,
   incompleteCount: PropTypes.number.isRequired,
-  currentUser: PropTypes.object,
-  showPrivateButton: PropTypes.bool.isRequired
+  currentUser: PropTypes.object
 };
 
 export default createContainer(() => {
-  Meteor.subscribe("tasks");
+  Meteor.subscribe('tasks');
+
   return {
     tasks: Tasks.find({}, { sort: { createdAt: -1 } }).fetch(),
     incompleteCount: Tasks.find({ checked: { $ne: true } }).count(),
